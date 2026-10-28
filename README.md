@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Intelligent Strawberry Freshness and Quality Assessment Using ViT, GNN/GAT, and Explainable AI
 
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-blue.svg)](https://www.python.org/)
@@ -239,3 +240,6 @@ Open your browser to `http://localhost:8501`.
    - Handled automatically via `sys.stdout.reconfigure(encoding="utf-8")` and clean ASCII console markers.
 3. **`Checkpoint Not Found`:**
    - Run `python src/train.py` before launching inference or Streamlit.
+=======
+# strawberry-ai-quality-assessment
+>>>>>>> 887e8704cab9fead70dafec7e0d0c62bbe23805c
