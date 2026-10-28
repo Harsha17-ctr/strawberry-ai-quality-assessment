@@ -1,0 +1,77 @@
+project:
+  name: "strawberry-ai"
+  title: "Intelligent Strawberry Freshness and Quality Assessment"
+  version: "1.0.0"
+  device: "cpu" # 'cuda' if available, otherwise 'cpu'
+  seed: 42
+
+dataset:
+  # Path to archive zip or extracted folder
+  archive_path: "C:/Users/harsha/Downloads/archive.zip"
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  splits_manifest: "data/processed/dataset_manifest.json"
+  image_size: 224
+  num_classes: 5
+  classes:
+    - "healthy_fresh"
+    - "anthracnose_fruit_rot"
+    - "blossom_blight"
+    - "gray_mold"
+    - "powdery_mildew_fruit"
+  class_display_names:
+    healthy_fresh: "Healthy Fresh Strawberry"
+    anthracnose_fruit_rot: "Anthracnose Fruit Rot"
+    blossom_blight: "Blossom Blight"
+    gray_mold: "Gray Mold"
+    powdery_mildew_fruit: "Powdery Mildew Fruit"
+  quality_grades:
+    healthy_fresh: "Grade A (Prime Fresh / Healthy)"
+    mild_infection: "Grade B (Commercial / Early Infection - Level 1)"
+    severe_infection: "Grade C (Substandard / Severe Infection - Level 2)"
+
+model:
+  vit_backbone: "vit_tiny_patch16_224" # lightweight timm ViT backbone, ideal for CPU/Intel Iris Xe
+  pretrained: true
+  freeze_vit: true # freeze ViT weights for fast transfer learning & CPU training
+  patch_size: 16
+  grid_size: 14 # 224 / 16 = 14x14 = 196 patches
+  embed_dim: 192 # vit_tiny feature dim per patch
+  
+  graph:
+    k_neighbors: 8 # spatial 8-nearest grid neighbors
+    similarity_threshold: 0.5 # feature cosine similarity edge threshold
+    connect_by: "hybrid" # 'spatial', 'similarity', or 'hybrid'
+    include_self_loops: true
+    
+  gat:
+    in_channels: 192
+    hidden_channels: 128
+    out_channels: 64
+    heads: 4
+    concat: false
+    dropout: 0.2
+    num_layers: 2
+    
+  classifier:
+    dropout: 0.3
+    pool_method: "mean_and_max" # combines mean & max pooling of node representations
+
+training:
+  batch_size: 32
+  num_workers: 0 # Windows multiprocessing safety
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  epochs: 5
+  patience: 2
+  checkpoint_dir: "checkpoints"
+  best_checkpoint_name: "best_strawberry_gat.pth"
+  save_every_epoch: false
+
+evaluation:
+  metrics_output_dir: "outputs/metrics"
+  figures_output_dir: "outputs/figures"
+
+explainability:
+  num_top_nodes: 15
+  saliency_method: "attention_rollout" # 'attention_rollout', 'gradcam', 'gat_edge_attention'
